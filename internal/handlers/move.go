@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func HandleMove(c *websocket.Conn, mt int, message []byte) error {
+func HandleMove(cp *clients.ConnectionPool, c *websocket.Conn, message []byte) error {
 	var moveMessage dto.MoveMessage
 
 	err := json.Unmarshal(message, &moveMessage)
@@ -19,9 +19,9 @@ func HandleMove(c *websocket.Conn, mt int, message []byte) error {
 		return err
 	}
 
-	sendTo := clients.GetUserById(moveMessage.ToUserId)
+	sendTo := cp.GetClientById(moveMessage.ToUserId)
 
-	go clients.SendMessageToClient(sendTo, mt, message)
+	go sendTo.SendMessage(message)
 
 	maps.AddToMap(
 		moveMessage.FromUserId,
@@ -43,7 +43,7 @@ func HandleMove(c *websocket.Conn, mt int, message []byte) error {
 			return err
 		}
 
-		c.WriteMessage(mt, winJson)
+		c.WriteMessage(websocket.TextMessage, winJson)
 
 		winMessage.GameId = moveMessage.FromUserId
 
@@ -53,7 +53,7 @@ func HandleMove(c *websocket.Conn, mt int, message []byte) error {
 			return err
 		}
 
-		clients.SendMessageToClient(sendTo, mt, winJson)
+		sendTo.SendMessage(winJson)
 	}
 
 	return nil

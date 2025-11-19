@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
+	"xo-websocket/internal/clients"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -17,9 +19,12 @@ func handleError(err error) {
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
+		fmt.Printf("Request from: %s\n", r.Host)
 		return true
 	},
 }
+
+var connectionPool = clients.NewConnectionPool()
 
 func Handler(ctx *gin.Context) {
 	w, r := ctx.Writer, ctx.Request
@@ -32,7 +37,7 @@ func Handler(ctx *gin.Context) {
 	defer c.Close()
 
 	for {
-		mt, message, err := c.ReadMessage()
+		_, message, err := c.ReadMessage()
 
 		if err != nil {
 			log.Println("error:", err)
@@ -40,15 +45,15 @@ func Handler(ctx *gin.Context) {
 		}
 
 		if bytes.HasPrefix(message, []byte("register:")) {
-			err := HandleRegistration(c, mt, message)
+			err := HandleRegistration(connectionPool, c, message)
 			handleError(err)
 
 		} else if bytes.HasPrefix(message, []byte("start:")) {
-			err := HandleStartGame(c, mt, message)
+			err := HandleStartGame(connectionPool, c, message)
 			handleError(err)
 
 		} else {
-			err := HandleMove(c, mt, message)
+			err := HandleMove(connectionPool, c, message)
 			handleError(err)
 		}
 

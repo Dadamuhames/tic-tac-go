@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func HandleStartGame(c *websocket.Conn, mt int, message []byte) error {
+func HandleStartGame(cp *clients.ConnectionPool, c *websocket.Conn, message []byte) error {
 	startMessage := bytes.Replace(message, []byte("start:"), []byte(""), 1)
 
 	fmt.Println(string(startMessage))
@@ -25,7 +25,7 @@ func HandleStartGame(c *websocket.Conn, mt int, message []byte) error {
 		return err
 	}
 
-	startWith := clients.GetUserById(start.ToUserId)
+	startWith := cp.GetClientById(start.ToUserId)
 
 	startResponse := dto.StartResponse{
 		MessageType: 1,
@@ -46,13 +46,13 @@ func HandleStartGame(c *websocket.Conn, mt int, message []byte) error {
 
 	responseBytes, err := json.Marshal(startResponse)
 
-	go clients.SendMessageToClient(startWith, mt, responseBytes)
+	go startWith.SendMessage(responseBytes)
 
 	startResponse.Xo = nextXO
 
 	responseBytes, err = json.Marshal(startResponse)
 
-	c.WriteMessage(mt, responseBytes)
+	c.WriteMessage(websocket.TextMessage, responseBytes)
 
 	maps.InitMap(start.FromUserId, start.ToUserId)
 

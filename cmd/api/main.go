@@ -4,19 +4,12 @@ import (
 	"flag"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"xo-websocket/internal/handlers"
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
-
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
 
 func main() {
 	flag.Parse()

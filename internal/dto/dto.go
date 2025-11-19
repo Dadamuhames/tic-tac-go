@@ -37,3 +37,8 @@ type WinnerMessage struct {
 	Winner      string `json:"winner"`
 	GameId      int    `json:"gameId"`
 }
+
+type CloseMessage struct {
+	MessageType int `json:"messageType"`
+	UserId      int `json:"userId"`
+}

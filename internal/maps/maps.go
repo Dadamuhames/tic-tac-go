@@ -63,8 +63,6 @@ func CheckWinner(fromId int, toId int) string {
 
 	b := *boardPtr
 
-	printBoard(b)
-
 	for i := 0; i < 3; i++ {
 		if b[i][0] != ' ' && b[i][0] == b[i][1] && b[i][1] == b[i][2] {
 			return string(b[i][0])
@@ -134,6 +132,7 @@ func printBoard(matrix [3][3]rune) {
 		fmt.Println()
 		if i < 2 {
 			fmt.Println("├───┼───┼───┤")
+
 		}
 	}
 	fmt.Println("└───┴───┴───┘")
