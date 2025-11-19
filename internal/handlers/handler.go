@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
 	"xo-websocket/internal/clients"
@@ -19,8 +18,7 @@ func handleError(err error) {
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		fmt.Printf("Request from: %s\n", r.Host)
-		return true
+		return true //r.Host == "xo-ui.vercel.app"
 	},
 }
 
